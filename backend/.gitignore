@@ -1,0 +1,29 @@
+# Python environment and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables (keep your secret keys safe!)
+.env
+
+# Database (You don't want to overwrite your live users.db with your local one)
+users.db
+*.sqlite3
+
+# Excel temporary files (Created when win32com opens Excel in the background)
+~$*.xlsx
+~$*.xlsm
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log

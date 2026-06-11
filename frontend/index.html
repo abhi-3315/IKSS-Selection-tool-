@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiller Selection Software</title>
+    
+    <!-- Link to your CSS files -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- =================== ADD THESE TWO SCRIPT TAGS =================== -->
+    <!-- 1. jsPDF Core Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- 2. jsPDF AutoTable Plugin (must be AFTER the core library) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- =================================================================== -->
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiller Selection Tool - Input</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body { padding: 20px; transition: margin-left 0.3s; margin-left: 56px; }
+        .main-content-wrapper { max-width: 1100px; margin: 0 auto; }
+        
+        .doc-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .doc-controls select {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 150px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div id="mySidebar" class="new-sidebar">
+
+        <div class="sb-hamburger" onclick="toggleNav()">
+            <span></span><span></span><span></span>
+        </div>
+
+        <div class="sb-item" onclick="showView('calculator')" style="border-bottom: 1px solid #4a4e69;">
+            <span class="sb-icon"><i class="fas fa-home"></i></span>
+            <span class="sb-label">New Selection</span>
+        </div>
+
+        <div class="sb-item active" id="water-cooled-link" onclick="switchChillerType('water')">
+            <span class="sb-icon"><i class="fas fa-water"></i></span>
+            <span class="sb-label">Water Cooled</span>
+        </div>
+
+        <div class="sb-item" id="air-cooled-link" onclick="switchChillerType('air')">
+            <span class="sb-icon"><i class="fas fa-wind"></i></span>
+            <span class="sb-label">Air Cooled</span>
+        </div>
+
+        <div class="sb-item" id="documents-link" onclick="showView('document', 'ENGINEERING BULLETIN')">
+            <span class="sb-icon"><i class="fas fa-folder-open"></i></span>
+            <span class="sb-label">Documents</span>
+        </div>
+
+        <div class="sb-item" id="gapid-link" onclick="showView('ga-pid')">
+            <span class="sb-icon"><i class="fas fa-search"></i></span>
+            <span class="sb-label">GA &amp; P&amp;ID</span>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- KNOWLEDGE REPOSITORY MENU                      -->
+        <!-- ============================================== -->
+        <div class="sb-item sb-has-sub" id="kr-link" onclick="toggleSubMenu('kr-sub')">
+            <span class="sb-icon"><i class="fas fa-book"></i></span>
+            <span class="sb-label">Knowledge Repository <i class="fas fa-chevron-down sb-arrow" id="kr-arrow"></i></span>
+        </div>
+        <div class="sb-submenu" id="kr-sub">
+
+            <!-- MAIN OPTION 1: Water Cooled -->
+            <div class="sb-sub-group" onclick="toggleSubMenu('kr-water-sub')">
+                <span class="sb-sub-group-icon"><i class="fas fa-water"></i></span>
+                <span class="sb-sub-group-label">Water Cooled <i class="fas fa-chevron-down sb-arrow" id="kr-water-arrow"></i></span>
+            </div>
+            <div class="sb-submenu sb-level2" id="kr-water-sub">
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KWK.pdf'); return false;">KWK</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KWI.pdf'); return false;">KWI</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KWS.pdf'); return false;">KWS</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KSC.pdf'); return false;">KSC</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KSC01.pdf'); return false;">KSC01</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KSC02.pdf'); return false;">KSC02</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KCM.pdf'); return false;">KCM</a>
+            </div>
+
+            <!-- MAIN OPTION 2: Air Cooled -->
+            <div class="sb-sub-group" onclick="toggleSubMenu('kr-air-sub')">
+                <span class="sb-sub-group-icon"><i class="fas fa-wind"></i></span>
+                <span class="sb-sub-group-label">Air Cooled <i class="fas fa-chevron-down sb-arrow" id="kr-air-arrow"></i></span>
+            </div>
+            <div class="sb-submenu sb-level2" id="kr-air-sub">
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KAS.pdf'); return false;">KAS</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('KAA.pdf'); return false;">KAA</a>
+            </div>
+
+            <!-- MAIN OPTION 3: Other -->
+            <div class="sb-sub-group" onclick="toggleSubMenu('kr-other-sub')">
+                <span class="sb-sub-group-icon"><i class="fas fa-folder"></i></span>
+                <span class="sb-sub-group-label">Other <i class="fas fa-chevron-down sb-arrow" id="kr-other-arrow"></i></span>
+            </div>
+            <div class="sb-submenu sb-level2" id="kr-other-sub">
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('MOC.pdf'); return false;">MOC</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('make list.pdf'); return false;">make list</a>
+                <a class="sb-sub-item sb-level3-item" href="#" onclick="openTdsDoc('HX detail.pdf'); return false;">HX detail</a>
+            </div>
+
+        </div><!-- /kr-sub END -->
+
+        <div class="sb-item sb-logout" onclick="logout()">
+            <span class="sb-icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="sb-label">Logout</span>
+        </div>
+
+    </div>
+
+    <!-- Script loaded BEFORE main content -->
+    <script src="js/script.js"></script>
+
+    <div class="main-content-wrapper">
+        <main class="container" style="min-height: 80vh;">
+
+            <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 20px;">
+                <div class="header-content" style="cursor: pointer;" onclick="showView('calculator')">
+                    <img src="assets/chillers_logo.png" alt="Kirloskar Chillers" class="header-logo" onerror="this.style.display='none'">
+                    <h1>Selection Tool</h1>
+                </div>
+            </header>
+
+            <!-- VIEW 1: CALCULATOR -->
+            <div id="calculator-view">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-item">
+                        <label for="chiller-series">Chiller Series</label>
+                        <select id="chiller-series"></select>
+                    </div>
+                    <div class="form-item">
+                        <label for="required-capacity">Required Capacity</label>
+                        <div class="unit-input-group">
+                            <input type="text" id="required-capacity" oninput="handleInput(this.id, 'capacity')" placeholder="Enter capacity">
+                            <select id="required-capacity-unit" onchange="convertAndDisplay(this.id, 'capacity')">
+                                <option value="kW">kW</option><option value="tonR">tonR</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-container">
+                    <div class="comparison-column">
+                        <h3>Evaporator</h3>
+                        <div class="form-item">
+                            <label>Entering Water Temp</label>
+                            <div class="unit-input-group">
+                                <input type="text" id="evap-entering-temp" oninput="handleInput(this.id, 'temperature')">
+                                <select id="evap-entering-temp-unit" onchange="convertAndDisplay(this.id, 'temperature')">
+                                    <option value="°C">°C</option><option value="°F">°F</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label>Leaving Water Temp</label>
+                            <div class="unit-input-group">
+                                <input type="text" id="evap-leaving-temp" oninput="handleInput(this.id, 'temperature')">
+                                <select id="evap-leaving-temp-unit" onchange="convertAndDisplay(this.id, 'temperature')">
+                                    <option value="°C">°C</option><option value="°F">°F</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label>Number of Passes</label>
+                            <select id="evap-passes"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+                        </div>
+                        <div class="form-item">
+                            <label>Fouling Factor</label>
+                            <div class="unit-input-group">
+                                <select id="evap-fouling-factor" onchange="handleFoulingFactorChange(this.id)"></select>
+                                <select id="evap-fouling-factor-unit" onchange="convertAndDisplay(this.id, 'foulingFactor')">
+                                    <option value="m²·K/kW">m²·K/kW</option><option value="ft²·h·°F/BTU">ft²·h·°F/BTU</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label>Tube Material</label>
+                            <select id="evap-tube-material">
+                                <option>Copper (Cu)</option><option>Stainless Steel (SS)</option>
+                                <option>Cupronickel (CuNi)</option><option>Titanium</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label>Percent of Brine</label>
+                            <select id="evap-brine-percent">
+                                <option>0</option><option>5</option><option>10</option>
+                                <option>20</option><option>25</option><option>30</option>
+                                <option>35</option><option>40</option><option>45</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="condenser-column-wrapper">
+                        <!-- WATER COOLED CONDENSER -->
+                        <div class="comparison-column" id="condenser-water-cooled">
+                            <h3>Condenser</h3>
+                            <div class="form-item">
+                                <label>Entering Water Temp</label>
+                                <div class="unit-input-group">
+                                    <input type="text" id="cond-entering-temp" oninput="handleInput(this.id, 'temperature')">
+                                    <select id="cond-entering-temp-unit" onchange="convertAndDisplay(this.id, 'temperature')">
+                                        <option value="°C">°C</option><option value="°F">°F</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <label>Leaving Water Temp</label>
+                                <div class="unit-input-group">
+                                    <input type="text" id="cond-leaving-temp" oninput="handleInput(this.id, 'temperature')">
+                                    <select id="cond-leaving-temp-unit" onchange="convertAndDisplay(this.id, 'temperature')">
+                                        <option value="°C">°C</option><option value="°F">°F</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <label>Number of Passes</label>
+                                <select id="cond-passes"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+                            </div>
+                            <div class="form-item">
+                                <label>Fouling Factor</label>
+                                <div class="unit-input-group">
+                                    <select id="cond-fouling-factor" onchange="handleFoulingFactorChange(this.id)"></select>
+                                    <select id="cond-fouling-factor-unit" onchange="convertAndDisplay(this.id, 'foulingFactor')">
+                                        <option value="m²·K/kW">m²·K/kW</option><option value="ft²·h·°F/BTU">ft²·h·°F/BTU</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <label>Tube Material</label>
+                                <select id="cond-tube-material">
+                                    <option>Copper (Cu)</option><option>Stainless Steel (SS)</option>
+                                    <option>Cupronickel (CuNi)</option><option>Titanium</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label>Percent of Brine</label>
+                                <select id="cond-brine-percent">
+                                    <option>0</option><option>5</option><option>10</option>
+                                    <option>15</option><option>20</option><option>25</option>
+                                    <option>30</option><option>35</option><option>40</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- AIR COOLED CONDENSER -->
+                        <div class="comparison-column" id="condenser-air-cooled" style="display: none;">
+                            <h3>Condenser</h3>
+                            <div class="form-item">
+                                <label>Ambient Temperature</label>
+                                <div class="unit-input-group">
+                                    <input type="text" id="ambient-temp" oninput="handleInput(this.id, 'temperature')">
+                                    <select id="ambient-temp-unit" onchange="convertAndDisplay(this.id, 'temperature')">
+                                        <option value="°C">°C</option><option value="°F">°F</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <label>Altitude (m)</label>
+                                <select id="altitude" onchange="handleInput(this.id, 'altitude')" data-base-value="0">
+                                    <option value="0">0</option>
+                                    <option value="152">152</option><option value="305">305</option>
+                                    <option value="457">457</option><option value="610">610</option>
+                                    <option value="762">762</option><option value="914">914</option>
+                                    <option value="1067">1067</option><option value="1219">1219</option>
+                                    <option value="1372">1372</option><option value="1524">1524</option>
+                                    <option value="1700">1700</option><option value="2134">2134</option>
+                                    <option value="2438">2438</option><option value="2743">2743</option>
+                                    <option value="3048">3048</option><option value="4572">4572</option>
+                                    <option value="6096">6096</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label>Fin Material</label>
+                                <select id="fin-material">
+                                    <option>bare aluminum</option><option>hydrophylic coated</option><option>copper</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label>Wet Bulb Temperature</label>
+                                <div class="unit-input-group">
+                                    <input type="text" id="wet-bulb-temp" oninput="handleInput(this.id, 'temperature')">
+                                    <select id="wet-bulb-temp-unit" onchange="convertAndDisplay(this.id, 'temperature')">
+                                        <option value="°C">°C</option><option value="°F">°F</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-button-container">
+                    <button type="button" class="btn" onclick="sendToBackend()"><i class="fas fa-calculator"></i> Calculate</button>
+                </div>
+
+                <div class="loading-spinner" id="loading" style="display:none;">
+                    <div class="spinner"></div><p>Processing... Please wait</p>
+                </div>
+                <div id="response-message"></div>
+
+                <div id="summaryView" style="display:none;"></div>
+                <div id="detailedViewWrapper" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <button class="btn btn-back" onclick="showSummaryView()"><i class="fas fa-arrow-left"></i> Back to Models</button>
+                    </div>
+                    <div id="detailedViewContent"></div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: GA & P&ID SEARCH -->
+            <div id="ga-pid-view" style="display: none;">
+                <h2 style="color: #343856; border-bottom: 2px solid #ddd; padding-bottom: 10px;">GA &amp; P&amp;ID Search</h2>
+                <div class="ga-search-box" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+                    <div class="form-item" style="flex: 1; min-width:120px;">
+                        <label>Search By</label>
+                        <select id="ga-search-type">
+                            <option value="so">SO Number</option>
+                            <option value="model">Model Name</option>
+                        </select>
+                    </div>
+                    <div class="form-item" style="flex: 3; min-width:200px;">
+                        <label>Enter Value</label>
+                        <input type="text" id="ga-search-input" placeholder="e.g. 11103278 or KAS.N1.D12V06.4" style="width:100%;">
+                    </div>
+                    <div class="form-item" style="flex: 1; min-width:100px;">
+                        <button class="btn" id="ga-search-btn" style="width:100%; height:38px; justify-content:center;" onclick="performGAPIDSearch()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <p id="ga-search-status" style="display:none; margin:10px 0; font-size:14px; padding:8px 12px; border-radius:4px; background:#f8f9fa;"></p>
+                <div id="ga-pid-result" style="display:none; margin-top:16px;">
+                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 16px; background:#f0f4ff; border-radius:6px; border:1px solid #c8d4f0;">
+                        <i class="fas fa-file-pdf" style="font-size:28px; color:#dc3545; flex-shrink:0;"></i>
+                        <div style="flex:1; min-width:0;">
+                            <h4 style="margin:0; color:#333;">Document Found</h4>
+                            <p id="ga-pid-doc-name" style="margin:4px 0 0 0; color:#555; font-size:14px; word-break:break-word;"></p>
+                        </div>
+                        <button id="gapid-open-btn" class="btn" style="white-space:nowrap;"><i class="fas fa-external-link-alt"></i> Open</button>
+                        <button id="gapid-download-btn" class="btn" style="white-space:nowrap;"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                    <div id="gapid-iframe-container" style="margin-top:12px;"></div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: DOCUMENT TABS VIEW -->
+            <div id="document-view" style="display: none;">
+                <div class="doc-tabs">
+                    <button class="doc-tab" onclick="switchDocCategory(event, 'ENGINEERING BULLETIN')">Engineering Bulletin</button>
+                    <button class="doc-tab" onclick="switchDocCategory(event, 'Engg. Specification')">Engineering Specifications</button>
+                    <button class="doc-tab" onclick="switchDocCategory(event, 'Product Info')">Product Info</button>
+                    <button class="doc-tab" onclick="switchDocCategory(event, 'Certificates')">Certificates</button>
+                </div>
+
+                <div class="doc-content">
+                    <div class="doc-controls" id="yearly-dropdown-container">
+                        <label style="font-weight:bold; color:#343856;">Select Year Folder:</label>
+                        <select id="doc-year-select" onchange="loadDocumentsForYear()"></select>
+                    </div>
+
+                    <p style="font-weight:bold; margin-bottom:15px; font-size:15px;">Please select document to view or download.</p>
+                    <div id="doc-radio-list" class="radio-list"></div>
+                    
+                    <div style="margin-top:20px; display:flex; gap:10px;">
+                        <button class="btn doc-view-btn" onclick="viewSelectedDoc()">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn doc-download-btn" onclick="downloadSelectedDoc()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+
+                <div class="doc-footer">
+                    Copyright &copy; Kirloskar Chillers Private Limited : All Rights Reserved
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

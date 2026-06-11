@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiller Selection - Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body { padding: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <header class="main-header">
+            <div class="header-content">
+                <img src="assets/chillers_logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+                <h1>Performance Report</h1>
+            </div>
+            <button class="btn btn-back" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </header>
+
+        <!-- DYNAMIC RESULTS AREA -->
+        <div id="resultsContent">
+            <!-- Populated by script.js -->
+        </div>
+
+        <!-- DOWNLOAD BUTTONS -->
+        <div class="button-group">
+            <!-- DYNAMIC RESULTS AREA -->
+<div id="summaryView">
+    <!-- Summary Table will be injected here -->
+</div>
+
+<div id="detailedViewWrapper" style="display: none;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        <button class="btn btn-back" onclick="showSummaryView()">
+            <i class="fas fa-arrow-left"></i> Back to Models
+        </button>
+        <!-- The download button will stay inside the detailed view tables as per your old code -->
+    </div>
+    
+    <div id="detailedViewContent">
+        <!-- Your ORIGINAL Detailed Tables will be injected here -->
+    </div>
+</div>
+        </div>
+
+        <div id="response-message"></div>
+    </div>
+
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

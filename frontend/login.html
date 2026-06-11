@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Kirloskar Chillers</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="login-body">
+
+<div class="main-container">
+
+    <!-- LEFT SIDE: SLIDESHOW -->
+    <div class="left-panel">
+        <img src="assets/3.jpeg"                                                          class="slide-img active" alt="Chiller 1">
+        <img src="assets/1.jpeg"                                                          class="slide-img"        alt="Chiller 2">
+        <img src="assets/kirloskar-air-cooled-chiller__1_.png"                            class="slide-img"        alt="Chiller 3">
+        <img src="assets/kirloskar-chillers-prodigy-water-cooled-img1_copy_600x360__1_.jpg" class="slide-img"      alt="Chiller 4">
+        <img src="assets/kirloskar-chillers-prodigy-air-cooled-img2-1_600x360.png"        class="slide-img"        alt="Chiller 5">
+    </div>
+
+    <!-- RIGHT SIDE: FORM -->
+    <div class="right-panel">
+
+        <div class="logo-container">
+            <img src="assets/chillers_logo.png" alt="Kirloskar Chillers">
+        </div>
+
+        <h2>Please sign in</h2>
+
+        <div class="input-group">
+            <input type="text"     id="username" placeholder="Username" autocomplete="username">
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+        </div>
+
+        <button class="login-btn" onclick="handleLogin()">
+            Sign In &#10095;
+        </button>
+
+        <p id="error-msg" class="error-msg"></p>
+
+        <div class="links">
+            <a href="#">Forgot password</a>
+            <a href="#">Sign up</a>
+        </div>
+
+        <div class="footer-text">
+            Copyright &copy; Kirloskar Chillers Private Limited (KCPL) 2025.
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Slideshow ──────────────────────────────────────────────────────────────
+    const slides = document.querySelectorAll('.slide-img');
+    let currentSlide = 0;
+
+    function startSlideshow() {
+        if (slides.length === 0) return;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 3000);
+    }
+    window.onload = startSlideshow;
+
+    // ── Login ──────────────────────────────────────────────────────────────────
+    const BACKEND_URL = 'http://localhost:5000';
+
+    async function handleLogin() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('error-msg');
+
+        errorMsg.style.display = 'none';
+
+        if (!username || !password) {
+            errorMsg.textContent = 'Please enter both username and password.';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('currentUser', username);
+                window.location.href = 'index.html';
+            } else {
+                errorMsg.textContent = data.error || 'Login failed.';
+                errorMsg.style.display = 'block';
+            }
+        } catch (err) {
+            errorMsg.textContent = 'Connection error. Is the server running?';
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    document.addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
+</script>
+
+</body>
+</html>
